@@ -1,6 +1,6 @@
 # Raspberry Pi Camera Import
 
-This instructions transform a Raspberry Pi to an automatic headless photo import device for digital cameras.
+These instructions transform a Raspberry Pi to an automatic headless photo import device for digital cameras.
 
 ## Features
 
