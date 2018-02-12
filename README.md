@@ -8,11 +8,11 @@ When a digital camera is plugged in the USB port, all new photos are copied to t
 
 The files are stored in the home directory and ordered by file date (usually the capture date):
 
-`/home/pi/Pictures/<Camera_Name_Serial_Number>/<Date>/<Filename>`
+`/home/pi/Pictures/<Camera_Name_Serial_Number>/<Camera_Directory>/<Date>/<Filename>`
 
 such as
 
-`/home/pi/Pictures/Sony_ILCE-7_xxxxxxxx/2018-02-11/DSC01234.jpg`
+`/home/pi/Pictures/Sony_ILCE-7_xxxxxxxx/store_00010001/2018-02-11/DSC01234.jpg`
 
 This way, the chance of duplicates is reduced (see "Restrictions").
 
