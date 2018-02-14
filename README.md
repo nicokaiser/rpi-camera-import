@@ -41,14 +41,18 @@ rpi-update
 
 ### Camera Import udev script
 
-This script is executed every time a PTP device is plugged in. All new files are imported, and if gphoto2 cannot recognize which photos are new (this feature is only supported on some camera types), duplicate filenames are skipped.
+This script is executed as systemd service every time a PTP device is plugged in. All new files are imported, and if gphoto2 cannot recognize which photos are new (this feature is only supported on some camera types), duplicate filenames are skipped.
 
 ```
-cat <<'EOF' > /home/pi/camera-import.sh
+cat <<'EOF' > /user/local/bin/camera-import.sh
 #!/bin/bash
 sudo mount -o remount,rw /
 mkdir -p ~/Pictures
 cd ~/Pictures
+if [ ! -z "$1" ]
+then
+        eval $(udevadm info --query=env --export $1)
+fi
 if [ ! -z "$ID_SERIAL" ]
 then
         serial=${ID_SERIAL//[![:word:]-]/}
@@ -58,14 +62,24 @@ then
                 cd $serial
         fi
 fi
-gphoto2 --new --get-all-files --skip-existing --filename="%F/%f.%C" >> ~/camera-import.log 2>&1
-echo "Done" >> ~/camera-import.log
+gphoto2 --new --get-all-files --skip-existing --filename="%F/%f.%C"
+echo "Done"
 sync
 sudo mount -o remount,ro /
 EOF
 
 cat <<'EOF' > /etc/udev/rules.d/70-camera-import.rules
-ACTION=="add", SUBSYSTEM=="usb", ENV{ID_USB_INTERFACES}=="*:060101:*", ENV{ID_GPHOTO2}=="1", RUN+="/bin/su -c '~/camera-import.sh' pi"
+ACTION=="add", SUBSYSTEM=="usb", ENV{ID_USB_INTERFACES}=="*:060101:*", ENV{ID_GPHOTO2}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}="camera-import@%E{DEVNAME}.service"
+EOF
+
+cat <<'EOF' > /etc/systemd/system/camera-import@.service
+[Unit]
+Description=Camera import
+
+[Service]
+Type=oneshot
+User=pi
+ExecStart=/usr/local/bin/camera-import.sh %I
 EOF
 ```
 
