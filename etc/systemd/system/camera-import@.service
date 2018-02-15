@@ -1,0 +1,10 @@
+[Unit]
+Description=Camera import
+
+[Service]
+Type=oneshot
+User=pi
+#ExecStartPre=+/bin/sh -c '/bin/sync; /bin/mount -o remount,rw /'
+ExecStart=/usr/local/bin/camera-import.py
+#ExecStartPost=+/bin/sh -c '/bin/sync; /bin/mount -o remount,ro /'
+Environment="PICTURES_DIR=/home/pi/Pictures/%i"

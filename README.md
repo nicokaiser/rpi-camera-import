@@ -8,11 +8,7 @@ When a digital camera is plugged in the USB port, all new photos are copied to t
 
 The files are stored in the home directory and ordered by file date (usually the capture date):
 
-`/home/pi/Pictures/<Camera_Name_Serial_Number>/<Camera_Directory>/<Date>/<Filename>`
-
-such as
-
-`/home/pi/Pictures/Sony_ILCE-7_xxxxxxxx/store_00010001/2018-02-11/DSC01234.jpg`
+`/home/pi/Pictures/<Camera_Name_Serial_Number>/<Date>/<Filename>`
 
 This way, the chance of duplicates is reduced (see "Restrictions").
 
@@ -35,52 +31,20 @@ sudo su -
 ```
 apt update
 apt upgrade -y
-apt install -y --no-install-recommends gphoto2
+apt install -y --no-install-recommends gphoto2 libgphoto2-dev python-pip python-setuptools
 rpi-update
+
+pip install gphoto2
 ```
 
-### Camera Import udev script
+### Camera Import script
 
 This script is executed as systemd service every time a PTP device is plugged in. All new files are imported, and if gphoto2 cannot recognize which photos are new (this feature is only supported on some camera types), duplicate filenames are skipped.
 
 ```
-cat <<'EOF' > /user/local/bin/camera-import.sh
-#!/bin/bash
-sudo mount -o remount,rw /
-mkdir -p ~/Pictures
-cd ~/Pictures
-if [ ! -z "$1" ]
-then
-        eval $(udevadm info --query=env --export $1)
-fi
-if [ ! -z "$ID_SERIAL" ]
-then
-        serial=${ID_SERIAL//[![:word:]-]/}
-        if [ ! -z $serial ]
-        then
-                mkdir -p $serial
-                cd $serial
-        fi
-fi
-gphoto2 --new --get-all-files --skip-existing --filename="%F/%f.%C"
-echo "Done"
-sync
-sudo mount -o remount,ro /
-EOF
-
-cat <<'EOF' > /etc/udev/rules.d/70-camera-import.rules
-ACTION=="add", SUBSYSTEM=="usb", ENV{ID_USB_INTERFACES}=="*:060101:*", ENV{ID_GPHOTO2}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}="camera-import@%E{DEVNAME}.service"
-EOF
-
-cat <<'EOF' > /etc/systemd/system/camera-import@.service
-[Unit]
-Description=Camera import
-
-[Service]
-Type=oneshot
-User=pi
-ExecStart=/usr/local/bin/camera-import.sh %I
-EOF
+cp usr/local/bin/camera-import.py /usr/local/bin
+cp etc/systemd/system/camera-import@.service /etc/systemd/system
+cp etc/udev/rules.d/70-camera-import.rules /etc/udev/rules.d
 ```
 
 ### Read-only mode
@@ -111,24 +75,8 @@ Make the Raspberry Pi open a Wi-Fi Access Point, so you can connect to it with y
 apt install -y --no-install-recommends hostapd
 echo "interface wlan0" >> /etc/dhcpcd.conf
 echo "static ip_address=192.168.4.1/24" >> /etc/dhcpcd.conf
-cat <<'EOF' > /etc/hostapd/hostapd.conf
-interface=wlan0
-driver=nl80211
-ssid=Raspberry Pi
-hw_mode=g
-channel=7
-wmm_enabled=0
-macaddr_acl=0
-auth_algs=1
-ignore_broadcast_ssid=0
-wpa=2
-wpa_key_mgmt=WPA-PSK
-wpa_passphrase=raspberry
-wpa_pairwise=TKIP
-rsn_pairwise=CCMP
-EOF
-mv /etc/default/hostapd /etc/default/hostapd.orig
-echo 'DAEMON_CONF="/etc/hostapd/hostapd.conf"' > /etc/default/hostapd
+cp etc/hostapd/hostapd.conf /etc/hostapd
+cp etc/default/hostapd /etc/default
 ```
 
 ### Announce SSH service via Bonjour
