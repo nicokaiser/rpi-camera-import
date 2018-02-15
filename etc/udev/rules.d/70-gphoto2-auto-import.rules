@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="usb", ENV{ID_USB_INTERFACES}=="*:060101:*", ENV{ID_GPHOTO2}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}="gphoto2-auto-import@%E{ID_SERIAL}.service"

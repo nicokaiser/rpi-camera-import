@@ -1,10 +1,10 @@
 [Unit]
-Description=Camera import
+Description=gphoto2 auto import
 
 [Service]
 Type=oneshot
 User=pi
 #ExecStartPre=+/bin/sh -c '/bin/sync; /bin/mount -o remount,rw /'
-ExecStart=/usr/local/bin/camera-import.py
+ExecStart=/usr/local/bin/gphoto2-auto-import.py
 #ExecStartPost=+/bin/sh -c '/bin/sync; /bin/mount -o remount,ro /'
 Environment="PICTURES_DIR=/home/pi/Pictures/%i"
