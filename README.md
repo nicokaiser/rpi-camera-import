@@ -32,7 +32,7 @@ sudo su -
 apt update
 apt upgrade -y
 apt install -y --no-install-recommends libgphoto2-6 libgphoto2-port12 \ 
-    libgphoto2-dev python3-pip python3-setuptools
+    libgphoto2-dev python3-dev python3-wheel python3-pip python3-setuptools
 
 pip3 install gphoto2
 
