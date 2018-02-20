@@ -104,3 +104,8 @@ systemctl disable hciuart.service
 echo "dtparam=audio=off" >> /boot/config.txt
 echo "dtoverplay=pi3-disable-bt" >> /boot/config.txt
 ```
+
+## References
+
+- [libgphoto2: camera access and control library](https://github.com/gphoto/libgphoto2)
+- [python-gphoto2: Python interface to libgphoto2](https://github.com/jim-easterbrook/python-gphoto2)
