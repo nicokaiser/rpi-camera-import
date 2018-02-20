@@ -51,8 +51,30 @@ sudo ./enable-read-only.sh
 
 Make the Raspberry Pi open a Wi-Fi Access Point, so you can connect to it with your mobile phone (any SSH client) and check the files that were imported.
 
+This `wpa_supplicant.conf` configuration tries to connect to `Your Home Network` first and if that fails, creates an own network called `Camera Import` with passphrase `raspberry`:
+
 ```
-sudo ./install-hotspot.sh
+country=DE
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+ap_scan=2
+
+network={
+    ssid="Your Home Network"
+    psk="yoursecretpassphrase"
+    key_mgmt=WPA-PSK
+}
+
+network={
+    ssid="Camera Import"
+    mode=2
+    frequency=2432
+    proto=RSN
+    key_mgmt=WPA-PSK
+    pairwise=CCMP
+    group=CCMP
+    psk="raspberry"
+}
 ```
 
 ### Announce SSH service via Bonjour
