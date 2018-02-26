@@ -93,6 +93,8 @@ If you would like to access the imported pictures via SMB, you can install `samb
 sudo ./install-samba.sh
 ```
 
+(This is currently untested and may collide with the read-only filesystem)
+
 ### Disable Bluetooth and Audio
 
 Since no Bluetooth and Audio support is needed, these can be disabled:

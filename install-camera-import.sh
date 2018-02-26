@@ -2,7 +2,7 @@
 
 apt install -y --no-install-recommends libgphoto2-6 libgphoto2-port12 libgphoto2-dev python3-dev python3-wheel python3-pip python3-setuptools
 
-# Install python3-gphoto3 library (will be packaged in Raspbian Buster)
+# Install python3-gphoto2 library (will be packaged in Raspbian Buster)
 pip3 install gphoto2
 
 cat <<'EOF' > /usr/local/bin/gphoto2-auto-import.py
@@ -22,6 +22,7 @@ import gphoto2 as gp
 PICTURES_DIR = os.getenv('PICTURES_DIR', os.getcwd())
 
 temp_dir = tempfile.mkdtemp()
+
 
 def get_all_files(camera, folder='/'):
     print('Listing files in %s' % (folder))
@@ -53,6 +54,7 @@ def get_all_files(camera, folder='/'):
     gp_list = gp.check_result(gp.gp_camera_folder_list_folders(camera, folder))
     for name, value in gp_list:
         get_all_files(camera, os.path.join(folder, name))
+
 
 if __name__ == '__main__':
     if not os.path.isdir(PICTURES_DIR):
