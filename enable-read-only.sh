@@ -1,20 +1,32 @@
-#!/bin/sh
+#!/bin/bash -e
 
-# Enable read-only filesystem mode
+# Disable swap file
+dphys-swapfile swapoff
+dphys-swapfile uninstall
+systemctl disable dphys-swapfile.service
 
-wget https://raw.githubusercontent.com/adafruit/Raspberry-Pi-Installer-Scripts/master/read-only-fs.sh
-bash read-only-fs.sh
+# Remove unwanted packages
+apt-get remove -y --purge logrotate fake-hwclock
 
-rm -rf /var/lib/dhcpcd5
-ln -s /tmp /var/lib/dhcpcd5
-systemctl disable apt-daily-upgrade.service
+# Disable apt activities
 systemctl disable apt-daily-upgrade.timer
+systemctl disable apt-daily.timer
+systemctl disable man-db.timer
 
-rm /var/lib/systemd/random-seed
-ln -s /tmp/random-seed /var/lib/systemd/random-seed
+# Move resolv.conf to /run
+mv /etc/resolv.conf /run/resolvconf/resolv.conf
+ln -s /run/resolvconf/resolv.conf /etc/resolv.conf
 
-mkdir -p /etc/systemd/system/systemd-random-seed.service.d/
-cat <<'EOF' > /etc/systemd/system/systemd-random-seed.service.d/override.conf
-[Service]
-ExecStartPre=/bin/sh -c "echo '' > /tmp/random-seed"
-EOF
+# Enable tmpfs /tmp and /var/tmp
+echo -e "D /tmp 1777 root root -\nq /var/tmp 1777 root root -" > /etc/tmpfiles.d/tmp.conf
+cp /usr/share/systemd/tmp.mount /etc/systemd/system/
+systemctl enable tmp.mount
+
+# Clean up /var
+rm -rf /var/cache/apt /var/cache/debconf /var/lib/apt/lists
+
+# Adjust kernel command line
+sed -i.backup -e 's/rootwait$/rootwait fsck.mode=skip noswap ro systemd.volatile=state/' /boot/cmdline.txt
+
+# Edit the file system table
+sed -i.backup -e 's/vfat\s*defaults\s/vfat defaults,ro/; s/ext4\s*defaults,noatime\s/ext4 defaults,noatime,ro/' /etc/fstab

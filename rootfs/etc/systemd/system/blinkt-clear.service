@@ -1,0 +1,10 @@
+[Unit]
+Description=Clear Piromoni Blinkt!
+DefaultDependencies=no
+
+[Service]
+ExecStart=/usr/local/bin/blinkt-clear.py
+Type=oneshot
+
+[Install]
+WantedBy=shutdown.target

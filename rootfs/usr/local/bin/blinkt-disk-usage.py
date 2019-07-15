@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+
+import psutil
+import blinkt
+
+blinkt.set_clear_on_exit(False)
+blinkt.set_brightness(0.1)
+v = psutil.disk_usage('/').percent / 100.0 * blinkt.NUM_PIXELS
+for x in range(blinkt.NUM_PIXELS):
+    if v > x:
+        blinkt.set_pixel(x, 15, 0, 0)
+    else:
+        blinkt.set_pixel(x, 0, 15, 0)
+blinkt.show()

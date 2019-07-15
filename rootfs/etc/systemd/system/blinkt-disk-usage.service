@@ -1,0 +1,11 @@
+[Unit]
+Description=Disk usage display for Pimoroni Blinkt!
+Conflicts=gphoto2-auto-import@.service
+
+[Service]
+Type=oneshot
+User=pi
+ExecStart=/usr/local/bin/blinkt-disk-usage.py
+
+[Install]
+WantedBy=graphical.target

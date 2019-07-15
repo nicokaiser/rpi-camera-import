@@ -15,8 +15,9 @@ This way, the chance of duplicates is reduced (see "Restrictions").
 ## Requirements
 
 - Raspberry Pi (B+, 2, 3, Zero, Zero W) with a free USB port
-- Raspbian Stretch Lite (tested with version 2017-11-29)
+- Raspbian Buster Lite (tested with version June 2019)
 - Digital Camera with PTP [supported by gphoto2](http://gphoto.org/proj/libgphoto2/support.php)
+- Optional: Piromoni Blinkt! for graphical status display
 
 ## Installation
 

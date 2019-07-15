@@ -33,5 +33,3 @@ cat <<'EOF' | smbpasswd -a pi -s
 raspberry
 raspberry
 EOF
-
-echo "tmpfs /var/lib/samba tmpfs nodev,nosuid 0 0" >> /etc/fstab

@@ -1,0 +1,12 @@
+[Unit]
+Description=gphoto2 auto import
+Requires=local-fs.target
+
+[Service]
+Type=simple
+User=pi
+ExecStartPre=+/bin/sh -c '/bin/sync; /bin/mount -o remount,rw /'
+ExecStart=/usr/local/bin/gphoto2-auto-import.py
+ExecStopPost=+/bin/sh -c '/bin/sync; /bin/mount -o remount,ro /'
+#ExecStopPost=/usr/local/bin/blinkt-disk-usage.py
+Environment="PICTURES_DIR=/home/pi/Pictures/%i"
