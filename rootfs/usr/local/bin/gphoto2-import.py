@@ -88,9 +88,13 @@ def main():
         print('%s -> %s' % (path, dest_dir))
         if not os.path.isdir(dest_dir):
             os.makedirs(dest_dir)
-        camera_file = gp.check_result(gp.gp_camera_file_get(
-            camera, folder, name, gp.GP_FILE_TYPE_NORMAL))
-        gp.check_result(gp.gp_file_save(camera_file, dest))
+        try:
+            camera_file = gp.check_result(gp.gp_camera_file_get(
+                camera, folder, name, gp.GP_FILE_TYPE_NORMAL))
+            gp.check_result(gp.gp_file_save(camera_file, dest))
+        except gp.GPhoto2Error as e:
+            if e.code != -6: # Ignore "Unsupported operation"
+                raise
     gp.check_result(gp.gp_camera_exit(camera))
     return 0
 
