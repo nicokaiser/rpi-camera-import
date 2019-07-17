@@ -1,5 +1,4 @@
 [Unit]
-Description=Clear Piromoni Blinkt!
 DefaultDependencies=no
 
 [Service]

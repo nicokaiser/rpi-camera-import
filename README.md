@@ -8,7 +8,7 @@ When a digital camera is plugged in the USB port, all new photos are copied to t
 
 The files are stored in the home directory and ordered by file date (usually the capture date):
 
-`/home/pi/Pictures/Sony_ILCE-7_xxxxxxxx/2018-02-13/DSC01234.arw`
+`/home/pi/Pictures/2018-02-13/DSC01234.arw`
 
 This way, the chance of duplicates is reduced (see "Restrictions").
 
@@ -43,8 +43,7 @@ sudo ./enable-read-only.sh
 ## Limitations
 
 - This only works with cameras supported by gphoto2 and with PTP mode (not USB mass storage mode).
-- There could theoretically be filename duplicates. That usually is, when more than 10.000 photos are taken with the same camera on the same day.
-- For some cameras, udev cannot determine a serial number. E.g. the folder for any Canon EOS 400D is always `Canon_Inc._Canon_Digital_Camera`. This may only be a problem when importing from more than one camera.
+- There could theoretically be filename duplicates. That usually is, when more than 10.000 photos are taken on the same day.
 
 ## Optional Components
 
