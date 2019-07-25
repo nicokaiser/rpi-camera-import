@@ -26,8 +26,10 @@ import gphoto2 as gp
 
 PHOTO_DIR = os.path.expanduser('~/Pictures')
 
+
 def get_target_dir(timestamp):
     return os.path.join(PHOTO_DIR, timestamp.strftime('%Y-%m-%d/'))
+
 
 def list_computer_files():
     result = []
@@ -35,6 +37,7 @@ def list_computer_files():
         for name in files:
             result.append(os.path.join(root, name))
     return result
+
 
 def list_camera_files(camera, path='/'):
     result = []
@@ -54,10 +57,12 @@ def list_camera_files(camera, path='/'):
         result.extend(list_camera_files(camera, os.path.join(path, name)))
     return result
 
+
 def get_camera_file_info(camera, path):
     folder, name = os.path.split(path)
     return gp.check_result(
         gp.gp_camera_file_get_info(camera, folder, name))
+
 
 def main():
     blinkt.set_clear_on_exit()
@@ -93,10 +98,11 @@ def main():
                 camera, folder, name, gp.GP_FILE_TYPE_NORMAL))
             gp.check_result(gp.gp_file_save(camera_file, dest))
         except gp.GPhoto2Error as e:
-            if e.code != -6: # Ignore "Unsupported operation"
+            if e.code != -6:  # Ignore "Unsupported operation"
                 raise
     gp.check_result(gp.gp_camera_exit(camera))
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main())
