@@ -12,13 +12,13 @@ The files are stored in the home directory and ordered by file date (usually the
 
 `/home/pi/Pictures/2018-02-13/DSC01234.arw`
 
-This way, the chance of duplicates is reduced (see "Restrictions").
+This way, the risk of duplicates is reduced (see "Restrictions").
 
 ## Requirements
 
 - Raspberry Pi (B+, 2, 3, Zero, Zero W) with a free USB port
 - Raspbian Buster Lite (tested with version June 2019)
-- USB SD card reader or Digital Camera with PTP or USB mass storage support
+- USB SD card reader or digital camera with PTP or USB mass storage support
 - Optional: Piromoni Blinkt! for graphical status display
 
 ## Installation
@@ -36,7 +36,7 @@ sudo ./install-camera-import.sh
 
 ### Read-only mode
 
-This puts the Raspbian filesystem into read-only mode and only remounts it to read-write when a camera is connected. So you can just pull the power plug when copying is done.
+This puts the Raspbian filesystem into read-only mode and only remounts it to read-write when files are copied. So you can just pull the power plug when copying is done.
 
 ```
 sudo ./enable-read-only.sh
@@ -44,16 +44,15 @@ sudo ./enable-read-only.sh
 
 ## Limitations
 
-- This only works with cameras that support USB mass storage mode or are supported by gphoto2 with PTP mode.
-- There could theoretically be filename duplicates. That usually is, when more than 10.000 photos are taken on the same day.
+- Only works with cameras that support USB mass storage mode or are supported by gphoto2 with PTP mode.
+- There could theoretically be filename duplicates. That usually is, when more than 10.000 photos are taken on the same day, or when backing up multiple cameras.
 - When using an USB card reader, you need to unplug and replug the card reader when changing cards.
 
 ## Optional Components
 
-
 ### Pimoroni Blinkt!
 
-[Blinkt!](https://github.com/pimoroni/blinkt) is a pHAT stacking header for Raspberry Pi with 8 RGB LEDs. If it is present, it is used for a simple status display:
+[Blinkt!](https://github.com/pimoroni/blinkt) is a pHAT stacking header for Raspberry Pi with 8 RGB LEDs. If it is installed, it is used for a simple status display:
 
 - When idle, disk usage is displayed with red/green LEDs
 - While copying, the progress is displayed [see video](https://www.youtube.com/watch?v=rcr646JgzJ4).
