@@ -2,7 +2,7 @@
 DefaultDependencies=no
 
 [Service]
-ExecStart=/usr/local/bin/blinkt-clear.py
+ExecStart=/usr/local/bin/blinkt-clear
 Type=oneshot
 
 [Install]

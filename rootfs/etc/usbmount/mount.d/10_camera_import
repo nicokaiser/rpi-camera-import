@@ -1,0 +1,18 @@
+#!/bin/sh
+
+[ -d "${UM_MOUNTPOINT}/DCIM" ] || exit 0
+
+READONLY=false
+if [ ! -w / ]; then
+    READONLY=true
+    mount -o remount,rw /
+fi
+
+sudo -u pi /usr/local/bin/camera-import-msd $UM_MOUNTPOINT
+
+if [ "$READONLY" = true ]; then
+    sync
+    mount -o remount,ro /
+fi
+
+/usr/local/bin/blinkt-disk-usage

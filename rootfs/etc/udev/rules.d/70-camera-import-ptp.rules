@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="usb", ENV{ID_USB_INTERFACES}=="*:060101:*", ENV{ID_GPHOTO2}=="1", PROGRAM="/bin/systemd-escape -p --template=camera-import-ptp@.service $env{DEVNAME}", TAG+="systemd", ENV{SYSTEMD_WANTS}+="%c"

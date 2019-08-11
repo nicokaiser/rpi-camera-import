@@ -1,10 +1,12 @@
 # Raspberry Pi Camera Import
 
-These instructions transform a Raspberry Pi to an automatic headless photo import device for digital cameras.
+These instructions transform a Raspberry Pi to an automatic headless photo import device for digital cameras and SD card readers.
+
+![Raspberry Pi Camera Import](preview.jpg)
 
 ## Features
 
-When a digital camera is plugged in the USB port, all new photos are copied to the Pi's SD card automatically. Use a reasonably large SD card and build a headless photo backup device.
+When a digital camera or and SD card reader is plugged in the USB port, all new photos are copied to the Pi's SD card automatically. Use a reasonably large SD card and build a headless photo backup device.
 
 The files are stored in the home directory and ordered by file date (usually the capture date):
 
@@ -16,7 +18,7 @@ This way, the chance of duplicates is reduced (see "Restrictions").
 
 - Raspberry Pi (B+, 2, 3, Zero, Zero W) with a free USB port
 - Raspbian Buster Lite (tested with version June 2019)
-- Digital Camera with PTP [supported by gphoto2](http://gphoto.org/proj/libgphoto2/support.php)
+- USB SD card reader or Digital Camera with PTP or USB mass storage support
 - Optional: Piromoni Blinkt! for graphical status display
 
 ## Installation
@@ -42,10 +44,19 @@ sudo ./enable-read-only.sh
 
 ## Limitations
 
-- This only works with cameras supported by gphoto2 and with PTP mode (not USB mass storage mode).
+- This only works with cameras that support USB mass storage mode or are supported by gphoto2 with PTP mode.
 - There could theoretically be filename duplicates. That usually is, when more than 10.000 photos are taken on the same day.
+- When using an USB card reader, you need to unplug and replug the card reader when changing cards.
 
 ## Optional Components
+
+
+### Pimoroni Blinkt!
+
+[Blinkt!](https://github.com/pimoroni/blinkt) is a pHAT stacking header for Raspberry Pi with 8 RGB LEDs. If it is present, it is used for a simple status display:
+
+- When idle, disk usage is displayed with red/green LEDs
+- While copying, the progress is displayed [see video](https://www.youtube.com/watch?v=rcr646JgzJ4).
 
 ### Wi-Fi Access Point
 
@@ -111,3 +122,4 @@ echo "dtoverplay=pi3-disable-bt" >> /boot/config.txt
 
 - [libgphoto2: camera access and control library](https://github.com/gphoto/libgphoto2)
 - [python-gphoto2: Python interface to libgphoto2](https://github.com/jim-easterbrook/python-gphoto2)
+- [usbmount](https://github.com/rbrito/usbmount)

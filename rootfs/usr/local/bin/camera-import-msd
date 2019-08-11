@@ -1,0 +1,73 @@
+#!/usr/bin/python3
+
+# Copyright (C) 2019  Nico Kaiser <nico@kaiser.me>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import sys
+import os
+from datetime import datetime
+from pathlib import Path
+import shutil
+import traceback
+import blinkt
+
+PICTURES_DIR = os.path.expanduser('~/Pictures')
+
+
+def main():
+    mountpoint = '/media/usb0'
+    if len(sys.argv) > 1:
+        mountpoint = sys.argv[1]
+
+    blinkt.set_clear_on_exit()
+    blinkt.set_brightness(0.1)
+    c = 0
+
+    for file in Path(mountpoint).glob('DCIM/*/*.*'):
+        if file.is_file() != True:
+            continue
+
+        blinkt.set_pixel(c % blinkt.NUM_PIXELS, 0, 0, 0)
+        c = c + 1
+        blinkt.set_pixel(c % blinkt.NUM_PIXELS, 31, 31, 31)
+        blinkt.show()
+
+        stat = file.stat()
+        dest_dir = Path(PICTURES_DIR).joinpath(datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d'))
+        if dest_dir.exists() != True:
+            dest_dir.mkdir(parents=True)
+
+        dest_file = dest_dir.joinpath(file.name)
+        if dest_file.exists() == True:
+            if dest_file.stat().st_size == stat.st_size:
+                print('Skipping existing file %s' % (file.name))
+                continue
+            print('Warning: existing file %s has different size, overwriting.' % dest_file)
+
+        try:
+            print('Downloading file %s' % (file.name))
+            shutil.copy2(str(file), str(dest_file))
+        except Exception as e:
+            pass
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(10)
+    except Exception:
+        traceback.print_exc()
+        sys.exit(1)

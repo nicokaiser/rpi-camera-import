@@ -1,9 +1,6 @@
-[Unit]
-Conflicts=gphoto2-auto-import@.service
-
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/blinkt-disk-usage.py
+ExecStart=/usr/local/bin/blinkt-disk-usage
 
 [Install]
 WantedBy=multi-user.target
