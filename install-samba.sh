@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/bin/bash -e
 
 # Install Samba for SMB access to imported Pictures
+
+if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
 
 apt install -y --no-install-recommends samba
 cat <<'EOF' > /etc/samba/smb.conf
