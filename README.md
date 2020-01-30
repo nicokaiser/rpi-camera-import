@@ -16,8 +16,8 @@ This way, the risk of duplicates is reduced (see "Restrictions").
 
 ## Requirements
 
-- Raspberry Pi (B+, 2, 3, Zero, Zero W) with a free USB port
-- Raspbian Buster Lite (tested with version June 2019)
+- Raspberry Pi with a free USB port
+- Raspbian Buster Lite (tested with version September 2019)
 - USB SD card reader or digital camera with PTP or USB mass storage support
 - Optional: Piromoni Blinkt! for graphical status display
 
