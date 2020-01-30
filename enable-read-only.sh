@@ -6,7 +6,8 @@ dphys-swapfile uninstall
 systemctl disable dphys-swapfile.service
 
 # Remove unwanted packages
-apt-get remove -y --purge logrotate fake-hwclock
+apt-get remove -y --purge triggerhappy logrotate dphys-swapfile fake-hwclock
+apt-get autoremove -y --purge
 
 # Disable apt activities
 systemctl disable apt-daily-upgrade.timer
