@@ -9,4 +9,4 @@ cp -a rootfs/* /
 
 systemctl daemon-reload
 systemctl enable blinkt-clear.service
-systemctl enable blinkt-disk-usage.service
+systemctl enable --now blinkt-disk-usage.service
