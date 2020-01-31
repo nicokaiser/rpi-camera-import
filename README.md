@@ -24,13 +24,10 @@ This way, the risk of duplicates is reduced (see "Restrictions").
 ## Installation
 
 ```
-sudo apt update -y
-sudo apt upgrade -y
-sudo apt install -y --no-install-recommends git
-
-git clone https://github.com/nicokaiser/rpi-camera-import.git
-cd rpi-camera-import
-
+wget -q https://github.com/nicokaiser/rpi-camera-import/archive/master.zip
+unzip master.zip
+rm master.zip
+cd rpi-camera-import-master
 sudo ./install-camera-import.sh
 ```
 
