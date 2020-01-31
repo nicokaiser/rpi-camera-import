@@ -28,6 +28,7 @@ wget -q https://github.com/nicokaiser/rpi-camera-import/archive/master.zip
 unzip master.zip
 rm master.zip
 cd rpi-camera-import-master
+
 sudo ./install-camera-import.sh
 ```
 
