@@ -67,7 +67,7 @@ This `wpa_supplicant.conf` configuration tries to connect to `Your Home Network`
 country=DE
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 update_config=1
-ap_scan=2
+ap_scan=1
 
 network={
     ssid="Your Home Network"
@@ -79,10 +79,7 @@ network={
     ssid="Camera Import"
     mode=2
     frequency=2432
-    proto=RSN
     key_mgmt=WPA-PSK
-    pairwise=CCMP
-    group=CCMP
     psk="raspberry"
 }
 ```
