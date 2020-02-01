@@ -90,16 +90,6 @@ To find the device's IP address, you can make it announce via Avahi (Bonjour). S
 sudo cp /usr/share/doc/avahi-daemon/examples/ssh.service /etc/avahi/services/ssh.service
 ```
 
-### Activate Samba access
-
-If you would like to access the imported pictures via SMB, you can install `samba` with a minimal configuration (please change the default password `raspberry`):
-
-```
-sudo ./install-samba.sh
-```
-
-(This is currently untested and may collide with the read-only filesystem)
-
 ### Disable Bluetooth and Audio
 
 Since no Bluetooth and Audio support is needed, these can be disabled:
