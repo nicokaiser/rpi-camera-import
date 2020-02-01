@@ -9,6 +9,9 @@ apt install -y --no-install-recommends python3-gphoto2 python3-blinkt python3-ps
 cp -a rootfs/* /
 dpkg -i --force-confold /usr/local/src/usbmount_0.0.24_all.deb
 
+# python3-blinkt Timing fix, see https://github.com/pimoroni/blinkt/pull/73
+sed -i.backup -e 's/time.sleep(0.0000005)/time.sleep(0)/' /usr/lib/python3/dist-packages/blinkt.py
+
 systemctl daemon-reload
 systemctl enable blinkt-clear.service
 systemctl enable --now blinkt-disk-usage.service
