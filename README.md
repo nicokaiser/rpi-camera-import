@@ -99,7 +99,7 @@ systemctl disable bluetooth.service
 systemctl disable hciuart.service
 
 echo "dtparam=audio=off" >> /boot/config.txt
-echo "dtoverplay=pi3-disable-bt" >> /boot/config.txt
+echo "dtoverlay=pi3-disable-bt" >> /boot/config.txt
 ```
 
 ## References
