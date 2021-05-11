@@ -23,21 +23,10 @@ This way, the risk of duplicates is reduced (see "Restrictions").
 
 ## Installation
 
-```
-wget -q https://github.com/nicokaiser/rpi-camera-import/archive/master.zip
-unzip master.zip
-rm master.zip
-cd rpi-camera-import-master
-
-sudo ./install-camera-import.sh
-```
-
-### Read-only mode
-
-This puts the Raspbian filesystem into read-only mode and only remounts it to read-write when files are copied. So you can just pull the power plug when copying is done.
+Install a new Raspberry Pi OS image on the device and make sure it is connected to the networks (the new device is assume to be reachable by `rasberrypi.local`).
 
 ```
-sudo ./enable-read-only.sh
+ansible-playbook -i hosts playbook.yml
 ```
 
 ## Limitations
@@ -88,18 +77,6 @@ To find the device's IP address, you can make it announce via Avahi (Bonjour). S
 
 ```
 sudo cp /usr/share/doc/avahi-daemon/examples/ssh.service /etc/avahi/services/ssh.service
-```
-
-### Disable Bluetooth and Audio
-
-Since no Bluetooth and Audio support is needed, these can be disabled:
-
-```
-systemctl disable bluetooth.service
-systemctl disable hciuart.service
-
-echo "dtparam=audio=off" >> /boot/config.txt
-echo "dtoverlay=pi3-disable-bt" >> /boot/config.txt
 ```
 
 ## References

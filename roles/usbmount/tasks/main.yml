@@ -1,0 +1,84 @@
+---
+- name: Install dependencies
+  apt:
+    state: present
+    name:
+      - lockfile-progs
+      - udev
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+     - /etc/usbmount
+     - /etc/usbmount/mount.d
+     - /etc/usbmount/umount.d
+     - /usr/share/usbmount
+
+- name: Install 00_create_model_symlink
+  ansible.builtin.copy:
+    src: 00_create_model_symlink
+    dest: /etc/usbmount/mount.d/00_create_model_symlink
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install 00_remove_model_symlink
+  ansible.builtin.copy:
+    src: 00_remove_model_symlink
+    dest: /etc/usbmount/umount.d/00_remove_model_symlink
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install /usr/share/usbmount/usbmount
+  ansible.builtin.copy:
+    src: usbmount
+    dest: /usr/share/usbmount/usbmount
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install /etc/usbmount/usbmount.conf
+  ansible.builtin.copy:
+    src: usbmount.conf
+    dest: /etc/usbmount/usbmount.conf
+    owner: root
+    group: root
+    mode: '0644'
+    force: no
+
+- name: Install /lib/udev/rules.d/90-usbmount.rules
+  ansible.builtin.copy:
+    src: 90-usbmount.rules
+    dest: /lib/udev/rules.d/90-usbmount.rules
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install /lib/systemd/system/usbmount@.service
+  ansible.builtin.copy:
+    src: usbmount@.service
+    dest: /lib/systemd/system/usbmount@.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create default mountpoints
+  ansible.builtin.file:
+    path: "/media/{{ item }}"
+    state: directory
+  loop:
+    - usb0
+    - usb1
+    - usb2
+    - usb3
+
+- name: Create /media/usb symlink
+  ansible.builtin.file:
+    src: usb0
+    dest: /media/usb
+    state: link
