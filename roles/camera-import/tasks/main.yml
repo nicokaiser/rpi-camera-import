@@ -1,0 +1,68 @@
+---
+- name: Install dependencies
+  apt:
+    state: present
+    name:
+      - exfat-fuse
+      - python3-blinkt
+      - python3-gphoto2
+      - python3-psutil
+    install_recommends: no
+    update_cache: yes
+    cache_valid_time: 3600
+
+# see https://github.com/pimoroni/blinkt/pull/73 
+- name: Fix python3-blinkt timing
+  ansible.builtin.replace:
+    path: /usr/lib/python3/dist-packages/blinkt.py
+    regexp: 'time.sleep(0.0000005)'
+    replace: 'time.sleep(0)'
+    backup: yes
+
+- name: Install scripts
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: '0755'
+  loop:
+    - blinkt-clear
+    - blinkt-disk-usage
+    - camera-import-msd
+    - camera-import-ptp
+
+- name: Install services
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+  loop:
+    - blinkt-clear.service
+    - blinkt-disk-usage.service
+    - camera-import-ptp.service
+
+- name: Install udev rules
+  ansible.builtin.copy:
+    src: 70-camera-import-ptp.rules
+    dest: /etc/udev/rules.d/70-camera-import-ptp.rules
+
+- name: Install usbmount config
+  ansible.builtin.copy:
+    src: usbmount.conf
+    dest: /etc/usbmount/usbmount.conf
+
+- name: Install usbmount hooks
+  ansible.builtin.copy:
+    src: 10_camera_import
+    dest: /etc/usbmount/mount.d/10_camera_import
+  mode: '0755'
+
+- name: Enable service blinkt-clear
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    name: blinkt-clear
+    enabled: yes
+
+- name: Enable service blinkt-disk-usage
+  ansible.builtin.systemd:
+    name: blinkt-disk-usage
+    state: started
+    enabled: yes

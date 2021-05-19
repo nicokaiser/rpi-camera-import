@@ -1,0 +1,2 @@
+[raspberrypi]
+raspberrypi.local ansible_user=pi ansible_python_interpreter=/usr/bin/python3 ansible_connection=paramiko

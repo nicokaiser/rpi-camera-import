@@ -1,0 +1,8 @@
+---
+- hosts: all
+  become: true
+      
+  roles:
+    - role: raspbian
+    - role: usbmount
+    - role: camera-import
