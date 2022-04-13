@@ -12,7 +12,7 @@ The files are ordered by file date (usually the capture date):
 
 `/mnt/pictures/2018-02-13/DSC01234.arw`
 
-This way, the risk of duplicates is reduced (see "Restrictions").
+This way, the risk of duplicates is reduced (see "Limitations").
 
 ## Requirements
 
@@ -56,7 +56,13 @@ sudo dphys-swapfile uninstall
 sudo systemctl disable dphys-swapfile
 
 # Remove unused packages
-sudo apt purge -y triggerhappy build-essential gcc-10 mkvtoolnix libc6-dev firmware-libertas firmware-atheros bluez gdb libc6-dbg manpages-dev dpkg-dev libraspberrypi-dev userconf-pi
+sudo apt purge -y triggerhappy build-essential gcc-10 mkvtoolnix libc6-dev firmware-libertas firmware-atheros bluez gdb libc6-dbg manpages-dev dpkg-dev libraspberrypi-dev userconf-pi man-db
+
+# Disable apt timers
+sudo systemctl stop apt-daily.timer apt-daily-upgrade.timer
+sudo systemctl disable apt-daily.timer apt-daily-upgrade.timer
+sudo systemctl mask apt-daily.service apt-daily-upgrade.service
+sudo systemctl daemon-reload
 
 sudo apt autoremove --purge -y
 ```
