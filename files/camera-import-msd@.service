@@ -1,0 +1,9 @@
+[Service]
+Type=simple
+RemainAfterExit=false
+ExecStartPre=+/bin/sh -c '/bin/sync; /bin/mount -o remount,rw /mnt/pictures'
+ExecStartPre=+/bin/sh -c 'mkdir -p /media/%i; /bin/mount -r /dev/%i /media/%i'
+ExecStart=/usr/local/bin/camera-import-msd /media/%i /mnt/pictures
+ExecStopPost=+/bin/sh -c '/bin/umount /media/%i; rmdir /media/%i'
+ExecStopPost=+/bin/sh -c '/bin/sync; /bin/mount -o remount,ro /mnt/pictures'
+ExecStopPost=/usr/local/bin/blinkt-disk-usage

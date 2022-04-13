@@ -8,32 +8,96 @@ These instructions transform a Raspberry Pi to an automatic headless photo impor
 
 When a digital camera or and SD card reader is plugged in the USB port, all new photos are copied to the Pi's SD card automatically. Use a reasonably large SD card and build a headless photo backup device.
 
-The files are stored in the home directory and ordered by file date (usually the capture date):
+The files are ordered by file date (usually the capture date):
 
-`/home/pi/Pictures/2018-02-13/DSC01234.arw`
+`/mnt/pictures/2018-02-13/DSC01234.arw`
 
 This way, the risk of duplicates is reduced (see "Restrictions").
 
 ## Requirements
 
 - Raspberry Pi with a free USB port
-- Raspbian Buster Lite (tested with version September 2019)
-- USB SD card reader or digital camera with PTP or USB mass storage support
+- Raspberry Pi OS 11 Lite (tested with version 2022-04-04)
+- USB SD card reader or digital camera with USB mass storage support
 - Optional: Piromoni Blinkt! for graphical status display
 
 ## Installation
 
-Install a new Raspberry Pi OS image on the device and make sure it is connected to the networks (the new device is assume to be reachable by `rasberrypi.local`).
+Install a new Raspberry Pi OS image on the device and make sure it is connected to the network. The new device is assumed to be reachable by `camera-import.local`.
 
+### Create a "pictures" partition
+
+**Important:** Before the first boot (!), mount the "boot" partition (e.g. on another PC or Mac) and remove `init=/usr/lib/raspi-config/init_resize.sh ` from cmdline.txt. This allows a second, large, partition to be created.
+
+Boot the device and log in, then add a partition:
+
+```sh
+# Use cfdisk to create a primary partition in the free space
+sudo cfdisk /dev/mmcblk0
+
+sudo mkfs.ext4 -L pictures /dev/mmcblk0p3
+printf "LABEL=pictures\t/mnt/pictures\text4\tdefaults,noatime,ro\t0\t2\n" | sudo tee -a /etc/fstab > /dev/null
+sudo mkdir /mnt/pictures
+sudo mount /mnt/pictures
 ```
-ansible-playbook -i hosts playbook.yml
+
+### Remove unused packages and daemons
+
+```sh
+# Disable Bluetooth and Audio
+sudo systemctl disable bluetooth hciuart
+echo "gpu_mem=16" >> /boot/config.txt
+echo "dtparam=audio=off" >> /boot/config.txt
+echo "dtparam=disable-bt" >> /boot/config.txt
+
+# Disable swap
+sudo dphys-swapfile swapoff
+sudo dphys-swapfile uninstall
+sudo systemctl disable dphys-swapfile
+
+# Remove unused packages
+sudo apt purge -y triggerhappy build-essential gcc-10 mkvtoolnix libc6-dev firmware-libertas firmware-atheros bluez gdb libc6-dbg manpages-dev dpkg-dev libraspberrypi-dev userconf-pi
+
+sudo apt autoremove --purge -y
 ```
+
+### Install scripts and services
+
+```sh
+# Install packages
+sudo apt install -y --no-install-recommends exfat-fuse python3-blinkt python3-psutil
+
+# Fix python3-blinkt timing, see https://github.com/pimoroni/blinkt/pull/73 
+sudo sed -i.backup 's/time.sleep(0.0000005)/time.sleep(0)/g' /usr/lib/python3/dist-packages/blinkt.py
+
+# Install files
+sudo install -m 0755 files/blinkt-clear /usr/local/bin/
+sudo install -m 0755 files/blinkt-disk-usage /usr/local/bin/
+sudo install -m 0755 files/camera-import-msd /usr/local/bin/
+sudo install -m 0644 files/blinkt-clear.service /etc/systemd/system/
+sudo install -m 0644 files/blinkt-disk-usage.service /etc/systemd/system/
+sudo install -m 0644 files/camera-import-msd@.service /etc/systemd/system/
+sudo install -m 0644 files/99-camera-import-msd.rules /etc/udev/rules.d/
+
+sudo systemctl enable blinkt-disk-usage.service
+sudo systemctl enable blinkt-clear.service
+
+# Announce SSH service via Bonjour
+sudo cp /usr/share/doc/avahi-daemon/examples/ssh.service /etc/avahi/services/ssh.service
+```
+
+### Enable overlay filesystem
+
+Using `raspi-config`, enable "Overlay File System".
+
+This allows the device to be switched off after transferring photos, without needing to properly shut down. The "pictures" partition is mounted read-write only during transfer, to minimize the risk of data loss if the device is switched off without being shut down.
 
 ## Limitations
 
-- Only works with cameras that support USB mass storage mode or are supported by gphoto2 with PTP mode.
+- Only works with cameras that support USB mass storage mode.
+- An older version had support for PTP through gphoto2, this may or may not work correctly.
 - There could theoretically be filename duplicates. That usually is, when more than 10.000 photos are taken on the same day, or when backing up multiple cameras.
-- When using an USB card reader, you need to unplug and replug the card reader when changing cards.
+- When using an USB card reader, you may need to unplug and replug the card reader when changing cards.
 
 ## Optional Components
 
@@ -43,44 +107,3 @@ ansible-playbook -i hosts playbook.yml
 
 - When idle, disk usage is displayed with red/green LEDs
 - While copying, the progress is displayed [see video](https://www.youtube.com/watch?v=rcr646JgzJ4).
-
-### Wi-Fi Access Point
-
-Make the Raspberry Pi open a Wi-Fi Access Point, so you can connect to it with your mobile phone (any SSH client) and check the files that were imported.
-
-This `wpa_supplicant.conf` configuration tries to connect to `Your Home Network` first and if that fails, creates an own network called `Camera Import` with passphrase `raspberry`:
-
-```
-country=DE
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
-ap_scan=1
-
-network={
-    ssid="Your Home Network"
-    psk="yoursecretpassphrase"
-    key_mgmt=WPA-PSK
-}
-
-network={
-    ssid="Camera Import"
-    mode=2
-    frequency=2432
-    key_mgmt=WPA-PSK
-    psk="raspberry"
-}
-```
-
-### Announce SSH service via Bonjour
-
-To find the device's IP address, you can make it announce via Avahi (Bonjour). SSH clients like Prompt or Termius (iOS) can find the device in the same network:
-
-```
-sudo cp /usr/share/doc/avahi-daemon/examples/ssh.service /etc/avahi/services/ssh.service
-```
-
-## References
-
-- [libgphoto2: camera access and control library](https://github.com/gphoto/libgphoto2)
-- [python-gphoto2: Python interface to libgphoto2](https://github.com/jim-easterbrook/python-gphoto2)
-- [usbmount](https://github.com/rbrito/usbmount)

@@ -1,0 +1,6 @@
+[Service]
+Type=oneshot
+ExecStart=sh -c 'if systemctl is-active camera-import-msd.service | grep inactive; then /usr/local/bin/blinkt-disk-usage; fi'
+
+[Install]
+WantedBy=multi-user.target

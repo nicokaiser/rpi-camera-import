@@ -1,6 +1,0 @@
-[Service]
-Type=oneshot
-ExecStart=/usr/local/bin/blinkt-disk-usage
-
-[Install]
-WantedBy=multi-user.target
