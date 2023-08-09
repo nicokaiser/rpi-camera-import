@@ -77,13 +77,13 @@ sudo apt install -y --no-install-recommends exfat-fuse python3-blinkt python3-ps
 sudo sed -i.backup 's/time.sleep(0.0000005)/time.sleep(0)/g' /usr/lib/python3/dist-packages/blinkt.py
 
 # Install files
-sudo install -m 0755 usr/local/bin/blinkt-clear /usr/local/bin/
-sudo install -m 0755 usr/local/bin/blinkt-disk-usage /usr/local/bin/
-sudo install -m 0755 usr/local/bin/camera-import-msd /usr/local/bin/
-sudo install -m 0644 etc/systemd/system/blinkt-clear.service /etc/systemd/system/
-sudo install -m 0644 etc/systemd/system/blinkt-disk-usage.service /etc/systemd/system/
-sudo install -m 0644 etc/systemd/system/camera-import-msd@.service /etc/systemd/system/
-sudo install -m 0644 etc/udev/rules.d/99-camera-import-msd.rules /etc/udev/rules.d/
+sudo install -m 0755 rootfs/usr/local/bin/blinkt-clear /usr/local/bin/
+sudo install -m 0755 rootfs/usr/local/bin/blinkt-disk-usage /usr/local/bin/
+sudo install -m 0755 rootfs/usr/local/bin/camera-import-msd /usr/local/bin/
+sudo install -m 0644 rootfs/etc/systemd/system/blinkt-clear.service /etc/systemd/system/
+sudo install -m 0644 rootfs/etc/systemd/system/blinkt-disk-usage.service /etc/systemd/system/
+sudo install -m 0644 rootfs/etc/systemd/system/camera-import-msd@.service /etc/systemd/system/
+sudo install -m 0644 rootfs/etc/udev/rules.d/99-camera-import-msd.rules /etc/udev/rules.d/
 
 sudo systemctl enable blinkt-disk-usage.service
 sudo systemctl enable blinkt-clear.service
