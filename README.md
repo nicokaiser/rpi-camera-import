@@ -17,7 +17,7 @@ This way, the risk of duplicates is reduced (see "Limitations").
 ## Requirements
 
 - Raspberry Pi with a free USB port
-- Raspberry Pi OS 11 Lite (tested with version 2022-04-04)
+- Raspberry Pi OS 12 Lite (tested with version 2024-11-19)
 - USB SD card reader or digital camera with USB mass storage support
 - Optional: Piromoni Blinkt! for graphical status display
 
@@ -25,30 +25,14 @@ This way, the risk of duplicates is reduced (see "Limitations").
 
 Install a new Raspberry Pi OS image on the device and make sure it is connected to the network. The new device is assumed to be reachable by `camera-import.local`.
 
-### Create a "pictures" partition
-
-**Important:** Before the first boot (!), mount the "boot" partition (e.g. on another PC or Mac) and remove `init=/usr/lib/raspi-config/init_resize.sh ` from cmdline.txt. This allows a second, large, partition to be created.
-
-Boot the device and log in, then add a partition:
-
-```sh
-# Use cfdisk to create a primary partition in the free space
-sudo cfdisk /dev/mmcblk0
-
-sudo mkfs.ext4 -L pictures /dev/mmcblk0p3
-printf "LABEL=pictures\t/mnt/pictures\text4\tdefaults,noatime,ro\t0\t2\n" | sudo tee -a /etc/fstab > /dev/null
-sudo mkdir /mnt/pictures
-sudo mount /mnt/pictures
-```
-
 ### Remove unused packages and daemons
 
 ```sh
 # Disable Bluetooth and Audio
 sudo systemctl disable bluetooth hciuart
-echo "gpu_mem=16" >> /boot/config.txt
-echo "dtparam=audio=off" >> /boot/config.txt
-echo "dtparam=disable-bt" >> /boot/config.txt
+echo "gpu_mem=16" >> /boot/firmware/config.txt
+echo "dtparam=audio=off" >> /boot/firmware/config.txt
+echo "dtparam=disable-bt" >> /boot/firmware/config.txt
 
 # Disable swap
 sudo dphys-swapfile swapoff
@@ -56,7 +40,7 @@ sudo dphys-swapfile uninstall
 sudo systemctl disable dphys-swapfile
 
 # Remove unused packages
-sudo apt purge -y triggerhappy build-essential gcc-10 mkvtoolnix libc6-dev firmware-libertas firmware-atheros bluez gdb libc6-dbg manpages-dev dpkg-dev libraspberrypi-dev userconf-pi man-db
+sudo apt purge -y triggerhappy build-essential gcc-12 mkvtoolnix libc6-dev firmware-libertas firmware-atheros bluez gdb libc6-dbg manpages-dev dpkg-dev userconf-pi man-db rpicam-apps-lite
 
 # Disable apt timers
 sudo systemctl stop apt-daily.timer apt-daily-upgrade.timer
@@ -71,7 +55,7 @@ sudo apt autoremove --purge -y
 
 ```sh
 # Install packages
-sudo apt install -y --no-install-recommends exfat-fuse python3-blinkt python3-psutil
+sudo apt install -y --no-install-recommends exfat-fuse python3-blinkt python3-psutil overlayroot
 
 # Fix python3-blinkt timing, see https://github.com/pimoroni/blinkt/pull/73 
 sudo sed -i.backup 's/time.sleep(0.0000005)/time.sleep(0)/g' /usr/lib/python3/dist-packages/blinkt.py
@@ -90,11 +74,27 @@ sudo systemctl enable blinkt-clear.service
 
 # Announce SSH service via Bonjour
 sudo cp /usr/share/doc/avahi-daemon/examples/ssh.service /etc/avahi/services/ssh.service
+
+# Clean up apt
+sudo apt clean
+sudo rm -rf /var/lib/apt/lists
+```
+
+### Create a "pictures" partition
+
+Use another device and gparted to resize the root partition to 2 GB and create a large partition called "pictures". Then reboot and add the mount point:
+
+```sh
+sudo mkfs.ext4 -L pictures /dev/mmcblk0p3
+printf "LABEL=pictures\t/mnt/pictures\text4\tdefaults,noatime,ro\t0\t2\n" | sudo tee -a /etc/fstab > /dev/null
+sudo mkdir /mnt/pictures
+sudo mount /mnt/pictures
 ```
 
 ### Enable overlay filesystem
 
-Using `raspi-config`, enable "Overlay File System".
+- Using `raspi-config`, enable "Overlay File System".
+- Change "overlayroot=tmpfs" to "overlayroot=tmpfs:recurse=0" in `/boot/firmware/cmdline.txt`
 
 This allows the device to be switched off after transferring photos, without needing to properly shut down. The "pictures" partition is mounted read-write only during transfer, to minimize the risk of data loss if the device is switched off without being shut down.
 
